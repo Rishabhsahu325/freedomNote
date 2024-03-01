@@ -161,7 +161,7 @@ class TagsDropDown(BoxLayout):
         self.dropDown=DropDown()
         self.tags={} # dictionary of status
         self.buttonName=buttonName
-        self.mainButton=Button(text=self.buttonName,size_hint=(None,0.25))
+        self.mainButton=Button(text=self.buttonName)
         self.mainButton.bind(on_press=self.displayTags)
         self.mainButton.bind(on_release= self.dropDown.open)
         

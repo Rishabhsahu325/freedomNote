@@ -13,11 +13,16 @@
 	Label:
 		text:root.title
 		color:"black"
-	#In future may have to create a TextInput field that allows editing after clicking
-	#TextInput:
+		height: self.texture_size[1]
+	#TextInput: may be used later to make the notes editable
 	Label:
 		text:root.content
 		color:"black"
+		size_hint_y: None
+		text_size: self.width, None
+		height: self.texture_size[1]
+	
+
 <TagItem>:
 	canvas.before:
 		Color:
@@ -35,7 +40,7 @@
 	Label:
 		id: tagText
 		text: root.tagName
-		height:40
+		height:self.texture_size[1]
 		color:root.color
 	CheckBox:
 		id: cb
@@ -45,6 +50,7 @@
 	
 <DisplayList>:
 	# greenish bounding box
+	size_hint_y: 0.6
     canvas.before:
 		Color:
             rgba: .1, 1,.1, .9
@@ -76,24 +82,31 @@
     	multiline: False
     	focus:True
     	hint_text: "Enter note Title"
-    	font_size: "25sp"
-    	#size_hint_y: 0.75
+    	font_size: "20sp"
+    	background_color: 0,0,0,0  
+        foreground_color: 0,1,255,0.7
+        size_hint_y: 0.3
+        padding: [3,3,3,3]
 	TextInput:
     	id: assignTag
     	multiline: False
-		hint_text:"Tag your note with some new Subject or Topic"	
+		hint_text: "Tag your note with some new Subject or Topic"
 		font_size:"15sp"
-		#size_hint_y:0.4
-#		size_hint_x:0.25
+		background_color: 0,0,0,0
+	    foreground_color: 0,1,255,0.7
+		size_hint_y: 0.5
+		padding: [1,1,1,1]
 	Button:
 		text: "Consider Tag "
 		on_press:root.fetchTagInput()
 		on_release: root.removeText(root.ids['assignTag'])
 		size_hint_x:0.25
+		size_hint_y:0.3
 	TagsDropDown:
 		id: reuseTag
 		#size_hint_y: 0.25
 		buttonName: "Pick from Previously used Tags"
+		size_hint_y: 0.4
     TextInput:
     #Enter Note here
         id: enterNote
@@ -101,7 +114,9 @@
         multiline: True
         focus:True
         hint_text: "Enter your note here.."
-        font_size: "20sp"
+        font_size: "18sp"
+        background_color: 0,0,0,0  
+        foreground_color: 0,1,255,0.7
    #Leave space to add tags
     
     Button:
@@ -133,39 +148,41 @@
         padding: 20
         orientation: "vertical"
         height: "50dp"
+        Label: 
+            id:title
+            text: "Freedom Note"
+            text_size: self.size
+            font_size:35
+            halign:'left'
+            valign:'top'
+            color: "black"
+            size_hint_y:0.25
         BoxLayout:
         	orientation: "horizontal"
-        	
-	        Label: 
-	            id:title
-	            text:"Notes App1"
-	            text_size: self.size
-	            font_size:40
-	            halign:'left'
-	            valign:'middle'
-	            color: "black"
+        	size_hint_y:0.12
+	        
 	        TextInput:
 	        	id:notesSearch
 				multiline: False
 				hint_text: "Search term"
-				size_hint_y: 0.25
+				#size_hint_y: 0.25
 				
 	        Button:
 	        	id:searchNow
         		text: "Search"
-        		size_hint_y: 0.25
+        		#size_hint_y: 0.25
         		on_press: root.ids['noteListParent'].searchCall(criteria=0,title=root.ids['notesSearch'].text)
         		on_release: root.removeText(root.ids['notesSearch'])
         	Button:
         		id:clearSearch
         		text: "Clear Filters"
-        		size_hint_y: 0.25
+        		#size_hint_y: 0.25
         		on_press:root.ids['noteListParent'].searchCall(criteria=2,title=None) 
         		on_release:root.ids['noteListParent'].removeText(root.ids['notesSearch']) ,root.ids['noteListParent'].resetSelections()
         	Button:
         		id:taggedSearch
         		text: "Filter by Tags"
-        		size_hint_y: 0.25
+        		#size_hint_y: 0.25
         		on_press:root.ids['noteListParent'].searchCall(criteria=1,title=None) 
         		on_release:root.ids['noteListParent'].removeText(root.ids['notesSearch']) 
 			TagsDropDown:
