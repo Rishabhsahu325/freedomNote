@@ -8,16 +8,15 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import Rectangle
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label 
-from kivy.uix.dropdown import DropDown # for getting tags
+from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
 from kivy.uix.checkbox import CheckBox 
 from kivy.properties import StringProperty,BooleanProperty
-#probable libraries for packaging application
+
 
 #For notes data management
 import sqlite3
 import os
-#depending on the requirement you might use a single connection object for all data manipulation operations
 script_dir = os.path.abspath( os.path.dirname( __file__ ) )
 
 
@@ -38,8 +37,13 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
         tagText=self.ids['assignTag'].text
         if tagText ==None or  tagText =="":
             return
-        self.ids['reuseTag'].displayTags(self.ids['reuseTag'].dropDown)
-        self.ids['reuseTag'].dropDown.container.add_widget(TagItem(tagName=tagText,color="blue",activate=True))
+        try:
+            self.ids['chosenTags'].addTagItem(TagItem(tagName=tagText,color="blue",activate=True))
+            #self.ids['reuseTag'].dropDown.add_widget(TagItem(tagName=tagText,color="blue",activate=True))
+        except Exception as e:
+            print(e)
+        
+        
     def addNote(self):
         try:
             #collect content from Text input and store in variable
@@ -48,7 +52,7 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
 
             noteTags=[]
             # fetch tags selected in tags list
-            for tItem in self.ids['reuseTag'].dropDown.container.children:
+            for tItem in self.ids['chosenTags'].ids['tagList']:
                 if tItem.children[0].active:         # checkbox is selected
                     noteTags.append(tItem.tagName)
                 
@@ -63,7 +67,6 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
             cursor.execute("SELECT MAX(id) FROM notes")
             val=1
             for maxId in cursor:
-                print(type(maxId))
                 val=maxId[0]
             if len(noteTags) != 0:
                 for tag in noteTags:
@@ -72,7 +75,7 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
                     cursor.execute(tagQry,tagParameter)
             #after all notes have been edited display status of operation
             noteListBox=self.parent.parent.ids["noteListParent"]
-            #In sqlite insertion query does not return inserted rows and result is typically emtpy
+            #In sqlite insertion query does not return inserted rows and result is typically empty
             conn.commit()                    
             noteListBox.addListItem(title=noteTitle.text,content=noteCont.text)
             
@@ -140,6 +143,7 @@ class DisplayList(BoxLayout): #for displaying list of Notes that are inserted
     def resetSelections(self):
         for tItem in self.parent.parent.ids['tgDrop'].dropDown.container.children:
             tItem.ids['cb'].active= False
+            
 class TagItem(BoxLayout):
     tagName=StringProperty("") # DEFINE PROPERTIES BEFORE PASSING THEM IN CONSTRUCTOR PARAMETERS IF NOT DEFINED UNDER KV FILE
     status=BooleanProperty(False)
@@ -149,7 +153,6 @@ class TagItem(BoxLayout):
         super(TagItem,self).__init__(**kwargs)
         self.tagName=tagName
         self.color=color
-        #self.status=status
         self.activate=activate
         
     def checkbox_click(self,instance,value):
@@ -163,31 +166,41 @@ class TagsDropDown(BoxLayout):
         self.buttonName=buttonName
         self.mainButton=Button(text=self.buttonName)
         self.mainButton.bind(on_press=self.displayTags)
-        self.mainButton.bind(on_release= self.dropDown.open)
-        
+        self.mainButton.bind(on_release=self.dropDown.open)
         self.add_widget(self.mainButton)
+
+        
     def displayTags(self,instance):
+    # to keep status of previously checked and unchecked  tags consistent 
         if self.tags == {}:
             self.getTags(instance)
-        
-            
+        #fix call where new tag addition is removed by dropDown.clear widgets function call
                     
     def getTags(self,instance):
+        try:
+            findTagQry="SELECT DISTINCT tagName FROM tags "
+            self.dropDown.clear_widgets()
+            qryResult=cursor.execute(findTagQry)
+            for row in qryResult:
+                self.tags[row]= False
+                tI=TagItem(tagName=row[0])
+                self.dropDown.add_widget(tI)  
+        except exception as e:
+            print(e)
 
-        findTagQry="SELECT DISTINCT tagName FROM tags "
-        self.dropDown.clear_widgets()
-        qryResult=cursor.execute(findTagQry)
-        for row in qryResult:
-            self.tags[row]= False
-            tI=TagItem(tagName=row[0])
-            self.dropDown.add_widget(tI)   
+class AssociatedTags(ScrollView):
+    def __init__(self,*args,**kwargs):
         
-#handle Top widget
+        super(AssociatedTags,self).__init__(*args,**kwargs)
+    def addTagItem(self,tagItem):   
+        self.ids['tagList'].add_widget(tagItem)
+        self.ids['tagList'].width=len(self.ids['tagList'].children)*15
+    
+    
 class NoteManager(BoxLayout):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.removeText=removeText
-    #after InsertNote portion loads, load the display List portion
     
     
 class NotesApp(App):
