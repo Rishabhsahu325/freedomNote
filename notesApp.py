@@ -53,7 +53,7 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
 
             noteTags=[]
             # fetch tags selected in tags list
-            for tItem in self.ids['chosenTags'].ids['tagList']:
+            for tItem in self.ids['chosenTags'].ids['tagList'].children:
                 if tItem.children[0].active:         # checkbox is selected
                     noteTags.append(tItem.tagName)
                 
@@ -81,12 +81,13 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
             noteListBox.addListItem(title=noteTitle.text,content=noteCont.text)
             
         except Exception as e:
+            
             print("Error in inserting data and creating new noteList Item widget rollback called")
             conn.rollback()
             print(e)
+            noteListBox.addListItem(title="ErrorCheck",content="Error")
+#           raise(e)
             
-    
-        
 class ListItem(BoxLayout):# Note items
     def __init__(self,noteTitle,noteContent,*tags,**kwargs):
         self.title=noteTitle
@@ -100,7 +101,7 @@ class DisplayList(BoxLayout): #for displaying list of Notes that are inserted
 
     def addListItem(self,title,content,*tags):   
         self.ids['noteList'].add_widget(ListItem(noteTitle=title,noteContent=content))
-        self.ids['noteList'].height=len(self.ids['noteList'].children)*100
+        #self.ids['noteList'].height=len(self.ids['noteList'].children)*100
            
     
     def cleanNotesList(self):
