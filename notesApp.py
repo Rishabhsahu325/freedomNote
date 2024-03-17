@@ -5,6 +5,7 @@ from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.graphics import Rectangle
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label 
@@ -190,7 +191,6 @@ class TagsDropDown(BoxLayout):
 
 class AssociatedTags(ScrollView):
     def __init__(self,*args,**kwargs):
-        
         super(AssociatedTags,self).__init__(*args,**kwargs)
     def addTagItem(self,tagItem):   
         self.ids['tagList'].add_widget(tagItem)
