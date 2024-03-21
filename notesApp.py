@@ -19,6 +19,7 @@ from kivy.properties import StringProperty,BooleanProperty
 import sqlite3
 import os
 script_dir = os.path.abspath( os.path.dirname( __file__ ) )
+app_path = os.path.dirname(os.path.abspath(__file__))
 
 
 
@@ -216,7 +217,7 @@ class NotesApp(App):
     def on_start(self):
         global conn
         global cursor
-        conn = sqlite3.connect("./notes.fnote")
+        conn = sqlite3.connect(os.path.join(app_path,'notes.fnote'))
         cursor= conn.cursor()
         createQry= "CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,title TEXT, content TEXT)"
         tagQry="CREATE TABLE IF NOT EXISTS tags(id INTEGER ,tagName TEXT,FOREIGN KEY(id) REFERENCES notes(id) ON DELETE CASCADE ON UPDATE NO ACTION ,PRIMARY KEY(id,tagName))"
